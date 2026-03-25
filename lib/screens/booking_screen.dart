@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/mock_data.dart';
-import '../widgets/pending_alert.dart';
+import '../widgets/pending_feature_widget.dart';
 import '../widgets/custom_button.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -98,7 +98,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       );
                       return;
                     }
-                    showPendingAlert(context, 'Se guardará la cita en PostgreSQL');
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Se guardará la cita en PostgreSQL')));
                   },
                 ),
               ]

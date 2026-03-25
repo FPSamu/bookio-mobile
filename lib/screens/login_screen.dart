@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/pending_alert.dart';
+import '../widgets/pending_feature_widget.dart';
 import '../widgets/custom_button.dart';
 import 'main_navigation.dart';
 
@@ -42,18 +42,18 @@ class LoginScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const MainNavigation()),
+                    MaterialPageRoute(builder: (context) => const MainNavigation(userRole: 'BUSINESS_OWNER')),
                   );
                 },
               ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => showPendingAlert(context, 'Autenticación con Supabase'),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Autenticación con Supabase'))),
                 child: const Text('Registrarse'),
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
-                onPressed: () => showPendingAlert(context, 'Autenticación con Supabase'),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Autenticación con Supabase'))),
                 icon: const Icon(Icons.g_mobiledata),
                 label: const Text('Login con Google'),
               ),

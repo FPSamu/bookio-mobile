@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/mock_data.dart';
-import '../widgets/pending_alert.dart';
+import '../widgets/pending_feature_widget.dart';
 
 class AppointmentsScreen extends StatelessWidget {
   const AppointmentsScreen({super.key});
@@ -27,7 +27,7 @@ class AppointmentsScreen extends StatelessWidget {
                     isThreeLine: true,
                     trailing: TextButton(
                       child: const Text('Cancelar', style: TextStyle(color: Colors.red)),
-                      onPressed: () => showPendingAlert(context, 'Cancelar cita (Eliminar de DB)'),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Cancelar cita (Eliminar de DB)'))),
                     ),
                   ),
                 );
