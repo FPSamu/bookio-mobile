@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../main.dart'; // To access global state
 import '../widgets/pending_feature_widget.dart';
-import 'login_screen.dart';
+import 'auth/login_screen.dart';
 import 'client/business_detail_screen.dart';
 
 class SettingsScreen extends StatelessWidget {

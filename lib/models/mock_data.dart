@@ -17,17 +17,33 @@ class Business {
 }
 
 class Appointment {
-  final int id;
+  final String id;
   final String businessName;
   final String service;
-  final String dateTime;
+  final DateTime dateTime;
+  final String status;
+  final String? imageUrl;
 
   Appointment({
     required this.id,
     required this.businessName,
     required this.service,
     required this.dateTime,
+    required this.status,
+    this.imageUrl,
   });
+
+  
+  factory Appointment.fromJson(Map<String, dynamic> json) {
+    return Appointment(
+      id: json['id'],
+      businessName: json['businessName'],
+      service: json['service'],
+      dateTime: DateTime.parse(json['dateTime']),
+      status: json['status'],
+      imageUrl: json['imageUrl'],
+    );
+  }
 }
 
 class MockData {
@@ -50,12 +66,30 @@ class MockData {
     ),
   ];
 
-  static final List<Appointment> appointments = [
+  static List<Appointment> appointments = [
     Appointment(
-      id: 1,
-      businessName: 'Peluquería Estilo',
-      service: 'Corte de Cabello',
-      dateTime: '2023-11-20 10:00 AM', // Simulated date
-    )
+      id: '1',
+      businessName: 'Sushi Place',
+      service: 'Cena para 2',
+      dateTime: DateTime.now().add(const Duration(hours: 3)),
+      status: 'Confirmada',
+      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvckX9gmBXYr9CUpxC5q8MZbUUaVtpTyTS6g&s',
+    ),
+    Appointment(
+      id: '2',
+      businessName: 'Italian Bistro',
+      service: 'Comida',
+      dateTime: DateTime.now().subtract(const Duration(days: 1)),
+      status: 'Completada',
+      imageUrl: 'https://www.pierrositalianbistro.com/wp-content/uploads/2024/03/2-slider.jpg',
+    ),
+    Appointment(
+      id: '3',
+      businessName: 'Steakhouse',
+      service: 'Cena',
+      dateTime: DateTime.now().add(const Duration(days: 2)),
+      status: 'Pendiente',
+      imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3ooe8l9ztS6hUche00QmSZdnsiD_Y6hDhuQ&s',
+    ),
   ];
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../models/mock_data.dart';
-import '../widgets/pending_feature_widget.dart';
-import '../widgets/custom_button.dart';
+import '../../models/mock_data.dart';
+import '../../widgets/pending_feature_widget.dart';
+import '../../widgets/custom_button.dart';
 
 class BookingScreen extends StatefulWidget {
   final Business business;

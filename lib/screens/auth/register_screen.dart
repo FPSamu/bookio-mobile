@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_navigation.dart';
+import '../main_navigation.dart';
 
 class RegisterSelectionScreen extends StatelessWidget {
   const RegisterSelectionScreen({super.key});

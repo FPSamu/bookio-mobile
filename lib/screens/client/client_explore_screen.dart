@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'category_list_screen.dart';
 import '../../widgets/pending_feature_widget.dart';
+import 'appointments_screen.dart';
 
 class ClientExploreScreen extends StatefulWidget {
   const ClientExploreScreen({super.key});
@@ -50,43 +51,44 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
-            
-            // Profile / Greeting Section
+            // Upcoming Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-                    child: const Icon(Icons.person, color: Colors.grey, size: 30),
+                  Text(
+                    'Upcoming',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hello, Sarah',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentsScreen()));
+                    },
+                    child: Text(
+                      'View all',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Ready to book your next appointment?',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            
+            _upcomingCard(
+              context,
+              Icons.restaurant,
+              "The Garden Bistro",
+              "Today, 7:30 PM",
+            ),
+            const SizedBox(height: 16),
 
             // Search Bar
             Padding(
@@ -151,51 +153,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
             ),
             const SizedBox(height: 32),
 
-            // Upcoming Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Upcoming',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Ver todas las Citas')));
-                    },
-                    child: Text(
-                      'View all',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
             
-            _upcomingCard(
-              context,
-              Icons.restaurant,
-              "The Garden Bistro",
-              "Today, 7:30 PM",
-            ),
-            const SizedBox(height: 12),
-            _upcomingCard(
-              context,
-              Icons.medical_services,
-              "Dr. Johnson",
-              "Tomorrow, 2:00 PM",
-            ),
-            const SizedBox(height: 32),
 
             // Quick Calendar
             Padding(

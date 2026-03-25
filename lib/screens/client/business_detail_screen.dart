@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/mock_data.dart';
-import '../booking_screen.dart';
+import 'booking_screen.dart';
 import '../../widgets/pending_feature_widget.dart';
 
 class BusinessDetailScreen extends StatelessWidget {

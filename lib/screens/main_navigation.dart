@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'appointments_screen.dart';
+import 'client/appointments_screen.dart';
 import 'settings_screen.dart';
 import 'business/admin_calendar.dart';
 import 'business/services.dart';
