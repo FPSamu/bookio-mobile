@@ -36,8 +36,8 @@ class _MainNavigationState extends State<MainNavigation> {
         ];
 
     final screens = isOwner 
-      ? [const AdminCalendar(), const ServicesScreen(), const MetricsScreen(), const SettingsScreen()]
-      : [const ClientExploreScreen(), const AppointmentsScreen(), const SettingsScreen()];
+      ? [const AdminCalendar(), const ServicesScreen(), const MetricsScreen(), const SettingsScreen(isBusiness: true)]
+      : [const ClientExploreScreen(), const AppointmentsScreen(), const SettingsScreen(isBusiness: false)];
 
     return Scaffold(
       backgroundColor: Colors.white,
