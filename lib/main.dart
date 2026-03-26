@@ -12,28 +12,29 @@ void main() async {
 class BookioApp extends StatefulWidget {
   const BookioApp({super.key});
 
-  // Global state for Dark Mode
-  static ValueNotifier<bool> isDarkModeNotifier = ValueNotifier(false);
+  static _BookioAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_BookioAppState>();
 
   @override
   State<BookioApp> createState() => _BookioAppState();
 }
 
 class _BookioAppState extends State<BookioApp> {
+  bool isDarkMode = false;
+
+  void toggleDarkMode(bool value) {
+    setState(() => isDarkMode = value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: BookioApp.isDarkModeNotifier,
-      builder: (context, isDark, child) {
-        return MaterialApp(
-          title: 'Bookio',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-          home: const LoginScreen(),
-        );
-      },
+    return MaterialApp(
+      title: 'Bookio',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: const LoginScreen(),
     );
   }
 }

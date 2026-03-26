@@ -4,10 +4,15 @@ import '../widgets/pending_feature_widget.dart';
 import 'auth/login_screen.dart';
 import 'client/business_detail_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final bool isBusiness;
   const SettingsScreen({super.key, this.isBusiness = false});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +51,11 @@ class SettingsScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 36,
                     backgroundColor: Colors.indigo.shade100,
-                    child: const Icon(Icons.person, size: 40, color: Colors.indigo),
+                    child: const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Colors.indigo,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -69,10 +78,13 @@ class SettingsScreen extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        if (isBusiness) ...[
+                        if (widget.isBusiness) ...[
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.teal.shade50,
                               borderRadius: BorderRadius.circular(8),
@@ -86,7 +98,7 @@ class SettingsScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   ),
@@ -100,7 +112,11 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _buildListTile(context, 'Editar Perfil', Icons.person_outline),
                 _buildDivider(),
-                _buildListTile(context, 'Notificaciones', Icons.notifications_none),
+                _buildListTile(
+                  context,
+                  'Notificaciones',
+                  Icons.notifications_none,
+                ),
               ],
             ),
 
@@ -110,34 +126,35 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _buildListTile(context, 'Idioma', Icons.language),
                 _buildDivider(),
-                ValueListenableBuilder<bool>(
-                  valueListenable: BookioApp.isDarkModeNotifier,
-                  builder: (context, isDark, _) {
-                    return SwitchListTile(
-                      title: const Text(
-                        'Modo Oscuro',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                      ),
-                      secondary: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.dark_mode_outlined, size: 20, color: Colors.black87),
-                      ),
-                      activeColor: Colors.indigo,
-                      value: isDark,
-                      onChanged: (value) {
-                        BookioApp.isDarkModeNotifier.value = value;
-                      },
-                    );
+                SwitchListTile(
+                  title: const Text(
+                    'Modo Oscuro',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  secondary: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.dark_mode_outlined,
+                      size: 20,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  activeColor: Colors.indigo,
+                  value: BookioApp.of(context)?.isDarkMode ?? false,
+                  onChanged: (value) {
+                    setState(() {
+                      BookioApp.of(context)?.toggleDarkMode(value);
+                    });
                   },
                 ),
               ],
             ),
 
-            if (isBusiness) ...[
+            if (widget.isBusiness) ...[
               const SizedBox(height: 24),
               _buildSectionTitle('Mi Negocio'),
               _buildSettingsCard(
@@ -149,15 +166,31 @@ class SettingsScreen extends StatelessWidget {
                         color: Colors.teal.shade50,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.remove_red_eye_outlined, size: 20, color: Colors.teal),
+                      child: const Icon(
+                        Icons.remove_red_eye_outlined,
+                        size: 20,
+                        color: Colors.teal,
+                      ),
                     ),
                     title: const Text(
                       'Ver Perfil (Vista Cliente)',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const BusinessDetailScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const BusinessDetailScreen(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -170,7 +203,11 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 _buildListTile(context, 'Centro de Ayuda', Icons.help_outline),
                 _buildDivider(),
-                _buildListTile(context, 'Política de Privacidad', Icons.privacy_tip_outlined),
+                _buildListTile(
+                  context,
+                  'Política de Privacidad',
+                  Icons.privacy_tip_outlined,
+                ),
               ],
             ),
 
@@ -181,7 +218,9 @@ class SettingsScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.logout, color: Colors.redAccent),
@@ -265,9 +304,18 @@ class SettingsScreen extends StatelessWidget {
         title,
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Colors.grey,
+      ),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => PendingFeatureWidget(featureName: title)));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PendingFeatureWidget(featureName: title),
+          ),
+        );
       },
     );
   }
