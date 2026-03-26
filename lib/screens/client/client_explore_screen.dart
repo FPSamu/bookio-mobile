@@ -58,7 +58,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Upcoming',
+                    'Próximas Citas',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -70,7 +70,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const AppointmentsScreen()));
                     },
                     child: Text(
-                      'View all',
+                      'Ver todas',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -86,7 +86,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
               context,
               Icons.restaurant,
               "The Garden Bistro",
-              "Today, 7:30 PM",
+              "Hoy, 7:30 PM",
             ),
             const SizedBox(height: 16),
 
@@ -109,7 +109,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
                       Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                       const SizedBox(width: 12),
                       Text(
-                        "Search restaurants, spas, doctors...",
+                        "Buscar restaurantes, spas, médicos...",
                         style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                       ),
                     ],
@@ -123,7 +123,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Book Services',
+                'Reservar Servicios',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -144,10 +144,10 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
                 children: [
-                  _categoryCard(context, Icons.restaurant, "Restaurant"),
+                  _categoryCard(context, Icons.restaurant, "Restaurante"),
                   _categoryCard(context, Icons.spa, "Spa"),
-                  _categoryCard(context, Icons.medical_services, "Doctor"),
-                  _categoryCard(context, Icons.content_cut, "Salon"),
+                  _categoryCard(context, Icons.medical_services, "Médico"),
+                  _categoryCard(context, Icons.content_cut, "Salón"),
                 ],
               ),
             ),
@@ -159,7 +159,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                'Quick Calendar',
+                'Calendario',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -329,7 +329,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
                   border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: Text(
-                  "Confirmed",
+                  "Confirmada",
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

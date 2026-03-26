@@ -9,7 +9,6 @@ class BusinessDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16.0),
@@ -26,12 +25,12 @@ class BusinessDetailScreen extends StatelessWidget {
                     business: Business(
                       id: 1,
                       name: 'Serenity Spa & Wellness',
-                      address: '123 Wellness Street, Downtown District',
+                      address: '123 Calle Wellness, Distrito Centro',
                       category: 'Spa',
                       imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=400',
                       services: ['Corte de Cabello', 'Tinte', 'Manicura'],
                     ),
-                    serviceName: 'Deep Tissue Massage',
+                    serviceName: 'Masaje de Tejido Profundo',
                   ),
                 ),
               );
@@ -50,7 +49,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 Icon(Icons.calendar_today, size: 18, color: Theme.of(context).cardColor),
                 const SizedBox(width: 8),
                 Text(
-                  'Book Appointment',
+                  'Reservar Cita',
                   style: TextStyle(
                     color: Theme.of(context).cardColor, 
                     fontSize: 16, 
@@ -67,12 +66,10 @@ class BusinessDetailScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 250.0,
             pinned: true,
-            
             elevation: 0,
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
-                
                 child: IconButton(
                   icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                   onPressed: () => Navigator.pop(context),
@@ -85,7 +82,6 @@ class BusinessDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
-                  
                   child: IconButton(
                     icon: Icon(Icons.favorite_border, color: Theme.of(context).colorScheme.onSurface),
                     onPressed: () {
@@ -102,7 +98,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   Container(
                     color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                     child: const Center(
-                      child: Text("Spa Interior Photo", style: TextStyle(color: Colors.black45)),
+                      child: Text("Foto Interior del Spa", style: TextStyle(color: Colors.black45)),
                     ),
                   ),
                   Positioned(
@@ -155,7 +151,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Luxury spa • Massage therapy',
+                    'Spa de lujo • Terapia de masajes',
                     style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   const SizedBox(height: 16),
@@ -164,7 +160,7 @@ class BusinessDetailScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.location_on, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                       const SizedBox(width: 8),
-                      Text('Downtown • 0.8 km away', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
+                      Text('Centro • a 0.8 km', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -172,25 +168,25 @@ class BusinessDetailScreen extends StatelessWidget {
                     children: [
                       Icon(Icons.access_time, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                       const SizedBox(width: 8),
-                      Text('Open until 9:00 PM', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
+                      Text('Abierto hasta las 9:00 PM', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
                     ],
                   ),
                   const SizedBox(height: 32),
 
-                  Text('Popular Services', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Servicios Populares', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 16),
-                  _serviceItem(context, 'Swedish Massage', '60 minutes • Relaxation', '\$89'),
+                  _serviceItem(context, 'Masaje Sueco', '60 minutos • Relajación', '\$89'),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Divider(height: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                   ),
-                  _serviceItem(context, 'Facial Treatment', '45 minutes • Anti-aging', '\$65'),
+                  _serviceItem(context, 'Tratamiento Facial', '45 minutos • Antienvejecimiento', '\$65'),
                   const SizedBox(height: 32),
 
-                  Text('About', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Acerca de', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 12),
                   Text(
-                    'Experience ultimate relaxation at our luxury spa. We offer a full range of therapeutic treatments in a serene environment designed to restore your mind and body.',
+                    'Experimenta la máxima relajación en nuestro spa de lujo. Ofrecemos una gama completa de tratamientos terapéuticos en un ambiente sereno diseñado para restaurar tu mente y cuerpo.',
                     style: TextStyle(color: Colors.grey[600], height: 1.5, fontSize: 14),
                   ),
                   const SizedBox(height: 32),
@@ -198,12 +194,12 @@ class BusinessDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Reviews (127)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                      Text('Reseñas (127)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Ver todas las Reseñas')));
                         },
-                        child: Text('See all', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
+                        child: Text('Ver todas', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
                       ),
                     ],
                   ),
@@ -232,7 +228,7 @@ class BusinessDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Amazing experience! The massage was incredibly relaxing and the staff was so professional.',
+                              '¡Experiencia increíble! El masaje fue increíblemente relajante y el personal muy profesional.',
                               style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4),
                             ),
                           ],
@@ -242,7 +238,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  Text('Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Ubicación', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
@@ -257,24 +253,24 @@ class BusinessDetailScreen extends StatelessWidget {
                         border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                       ),
                       child: Center(
-                        child: Text('Interactive Map', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                        child: Text('Mapa Interactivo', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '123 Wellness Street, Downtown District',
+                    '123 Calle Wellness, Distrito Centro',
                     style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
                   const SizedBox(height: 32),
 
-                  Text('Hours', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+                  Text('Horarios', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 12),
-                  _hoursRow(context, 'Monday - Friday', '9:00 AM - 9:00 PM'),
+                  _hoursRow(context, 'Lunes - Viernes', '9:00 AM - 9:00 PM'),
                   const SizedBox(height: 8),
-                  _hoursRow(context, 'Saturday', '8:00 AM - 10:00 PM'),
+                  _hoursRow(context, 'Sábado', '8:00 AM - 10:00 PM'),
                   const SizedBox(height: 8),
-                  _hoursRow(context, 'Sunday', '10:00 AM - 8:00 PM'),
+                  _hoursRow(context, 'Domingo', '10:00 AM - 8:00 PM'),
                   
                   const SizedBox(height: 32),
                 ],
@@ -296,7 +292,7 @@ class BusinessDetailScreen extends StatelessWidget {
               business: Business(
                 id: 1,
                 name: 'Serenity Spa & Wellness',
-                address: '123 Wellness Street, Downtown District',
+                address: '123 Calle Wellness, Distrito Centro',
                 category: 'Spa',
                 imageUrl: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=400',
                 services: ['Corte de Cabello', 'Tinte', 'Manicura'],
