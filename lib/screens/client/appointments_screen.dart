@@ -10,10 +10,10 @@ class AppointmentsScreen extends StatefulWidget {
   State<AppointmentsScreen> createState() => _AppointmentsScreenState();
 }
 
-class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTickerProviderStateMixin {
+class _AppointmentsScreenState extends State<AppointmentsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<Appointment> _appointments = MockData.appointments;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -27,16 +27,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
     super.dispose();
   }
 
-  Future<void> _refresh() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final upcoming = _appointments.where((a) => a.dateTime.isAfter(now)).toList();
+    final upcoming = _appointments
+        .where((a) => a.dateTime.isAfter(now))
+        .toList();
     final past = _appointments.where((a) => a.dateTime.isBefore(now)).toList();
 
     return Scaffold(
@@ -53,7 +49,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
           preferredSize: const Size.fromHeight(48.0),
           child: Container(
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+              ),
             ),
             child: TabBar(
               controller: _tabController,
@@ -61,8 +59,14 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
               unselectedLabelColor: Colors.grey.shade500,
               indicatorColor: Colors.indigo,
               indicatorWeight: 3,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
               tabs: const [
                 Tab(text: 'Próximas'),
                 Tab(text: 'Historial'),
@@ -81,25 +85,20 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
     );
   }
 
-  Widget _buildAppointmentList(List<Appointment> list, {required bool isUpcoming}) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
+  Widget _buildAppointmentList(
+    List<Appointment> list, {
+    required bool isUpcoming,
+  }) {
     if (list.isEmpty) {
       return _buildEmptyState(isUpcoming);
     }
 
-    return RefreshIndicator(
-      onRefresh: _refresh,
-      color: Colors.indigo,
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 16, bottom: 32),
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          return _buildAppointmentCard(context, list[index], isUpcoming);
-        },
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 16, bottom: 32),
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        return _buildAppointmentCard(context, list[index], isUpcoming);
+      },
     );
   }
 
@@ -119,7 +118,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                isUpcoming ? Icons.calendar_today_rounded : Icons.history_rounded,
+                isUpcoming
+                    ? Icons.calendar_today_rounded
+                    : Icons.history_rounded,
                 size: 64,
                 color: Colors.indigo.shade300,
               ),
@@ -135,7 +136,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
             ),
             const SizedBox(height: 12),
             Text(
-              isUpcoming 
+              isUpcoming
                   ? 'No tienes ninguna reservación activa en este momento. ¡Explora lugares increíbles cerca de ti!'
                   : 'Aún no has tenido ninguna cita. Cuando asistas a tus citas, aparecerán aquí.',
               textAlign: TextAlign.center,
@@ -156,7 +157,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const PendingFeatureWidget(featureName: 'Explorar Locales'),
+                        builder: (_) => const PendingFeatureWidget(
+                          featureName: 'Explorar Locales',
+                        ),
                       ),
                     );
                   },
@@ -180,8 +183,15 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
     );
   }
 
-  Widget _buildAppointmentCard(BuildContext context, Appointment apt, bool isUpcoming) {
-    final dateFormatted = DateFormat("EEEE, d 'de' MMMM", "es").format(apt.dateTime);
+  Widget _buildAppointmentCard(
+    BuildContext context,
+    Appointment apt,
+    bool isUpcoming,
+  ) {
+    final dateFormatted = DateFormat(
+      "EEEE, d 'de' MMMM",
+      "es",
+    ).format(apt.dateTime);
     final timeFormatted = DateFormat("h:mm a").format(apt.dateTime);
 
     return Container(
@@ -202,7 +212,12 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
         children: [
           // Header: Date + Status
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 12),
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: 12,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -218,9 +233,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
               ],
             ),
           ),
-          
+
           Divider(height: 1, color: Colors.grey.shade100),
-          
+
           // Body: Business info + Time
           Padding(
             padding: const EdgeInsets.all(16),
@@ -270,7 +285,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade50,
                     borderRadius: BorderRadius.circular(10),
@@ -278,7 +296,11 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                   ),
                   child: Column(
                     children: [
-                      const Icon(Icons.access_time_rounded, size: 16, color: Colors.indigo),
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 16,
+                        color: Colors.indigo,
+                      ),
                       const SizedBox(height: 4),
                       Text(
                         timeFormatted,
@@ -294,7 +316,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
               ],
             ),
           ),
-          
+
           // Footer: Action Buttons
           if (isUpcoming) ...[
             Divider(height: 1, color: Colors.grey.shade100),
@@ -312,7 +334,10 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('Cancelar', style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        'Cancelar',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -322,7 +347,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const PendingFeatureWidget(featureName: 'Reagendar Cita'),
+                            builder: (_) => const PendingFeatureWidget(
+                              featureName: 'Reagendar Cita',
+                            ),
                           ),
                         );
                       },
@@ -334,15 +361,18 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: const Text('Reagendar', style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        'Reagendar',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           ] else ...[
-             Divider(height: 1, color: Colors.grey.shade100),
-             Padding(
+            Divider(height: 1, color: Colors.grey.shade100),
+            Padding(
               padding: const EdgeInsets.all(12),
               child: SizedBox(
                 width: double.infinity,
@@ -351,12 +381,17 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const PendingFeatureWidget(featureName: 'Dejar Reseña'),
+                        builder: (_) => const PendingFeatureWidget(
+                          featureName: 'Dejar Reseña',
+                        ),
                       ),
                     );
                   },
                   icon: const Icon(Icons.star_outline_rounded, size: 18),
-                  label: const Text('Calificar experiencia', style: TextStyle(fontWeight: FontWeight.w600)),
+                  label: const Text(
+                    'Calificar experiencia',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.orange.shade700,
                     backgroundColor: Colors.orange.shade50,
@@ -366,8 +401,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                   ),
                 ),
               ),
-             ),
-          ]
+            ),
+          ],
         ],
       ),
     );
@@ -437,7 +472,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
                   content: const Text('Cita cancelada con éxito.'),
                   backgroundColor: Colors.indigo,
                   behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               );
             },
@@ -453,9 +490,9 @@ class _AppointmentsScreenState extends State<AppointmentsScreen> with SingleTick
     );
   }
 
- String _capitalizeFirst(String text) {
-  if (text.isEmpty) return text;
-  // Cambia \$ por $
-  return "${text[0].toUpperCase()}${text.substring(1)}";
-}
+  String _capitalizeFirst(String text) {
+    if (text.isEmpty) return text;
+    // Cambia \$ por $
+    return "${text[0].toUpperCase()}${text.substring(1)}";
+  }
 }
