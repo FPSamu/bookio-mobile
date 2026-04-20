@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../main.dart'; // To access global state
+import 'package:provider/provider.dart';
+import '../main.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/pending_feature_widget.dart';
-import 'auth/login_screen.dart';
 import 'client/business_detail_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -62,20 +63,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Usuario de Prueba',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'usuario@bookio.com',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
+                        Consumer<AppAuthProvider>(
+                          builder: (_, auth, __) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                auth.user?.name ?? 'Usuario',
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                auth.user?.email ?? '',
+                                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                              ),
+                            ],
                           ),
                         ),
                         if (widget.isBusiness) ...[
@@ -215,29 +220,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ),
-                  );
+                onPressed: () async {
+                  await context.read<AppAuthProvider>().logout();
+                  // AuthGate handles redirect automatically
                 },
                 icon: const Icon(Icons.logout, color: Colors.redAccent),
                 label: const Text(
                   'Cerrar sesión',
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Colors.red.withValues(alpha: 0.05),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),

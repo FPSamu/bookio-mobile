@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../main_navigation.dart';
+
+import 'client_register_screen.dart';
+import 'business_register_screen.dart';
 
 class RegisterSelectionScreen extends StatelessWidget {
   const RegisterSelectionScreen({super.key});
@@ -34,42 +36,35 @@ class RegisterSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Elige cómo deseas usar nuestra plataforma. Podrás cambiar o acceder a otras funciones más adelante.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                  height: 1.4,
-                ),
+                'Elige cómo deseas usar nuestra plataforma.',
+                style: TextStyle(fontSize: 16, color: Colors.grey.shade600, height: 1.4),
               ),
               const SizedBox(height: 48),
+
+              // ── Cliente ───────────────────────────────────────
               _buildSelectionCard(
                 context,
                 title: 'Soy Cliente',
-                description:
-                    'Busca servicios, agenda citas de manera rápida y administra tus reservas desde tu celular.',
+                description: 'Busca servicios, agenda citas de manera rápida y administra tus reservas.',
                 icon: Icons.person_search_rounded,
                 color: Colors.indigo,
-                onTap: () => Navigator.pushReplacement(
+                onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const MainNavigation(userRole: 'CLIENT'),
-                  ),
+                  MaterialPageRoute(builder: (_) => const ClientRegisterScreen()),
                 ),
               ),
               const SizedBox(height: 24),
+
+              // ── Negocio ───────────────────────────────────────
               _buildSelectionCard(
                 context,
                 title: 'Soy un Negocio',
-                description:
-                    'Publica tus servicios, gestiona la agenda de tus empleados y aumenta tus reservas fácilmente.',
+                description: 'Publica tus servicios, gestiona la agenda y aumenta tus reservas fácilmente.',
                 icon: Icons.storefront_rounded,
                 color: Colors.teal,
-                onTap: () => Navigator.pushReplacement(
+                onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        const MainNavigation(userRole: 'BUSINESS_OWNER'),
-                  ),
+                  MaterialPageRoute(builder: (_) => const BusinessRegisterScreen()),
                 ),
               ),
             ],
@@ -92,11 +87,7 @@ class RegisterSelectionScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
+          BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 10)),
         ],
       ),
       child: Material(
@@ -116,10 +107,7 @@ class RegisterSelectionScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
                   child: Icon(icon, color: color, size: 36),
                 ),
                 const SizedBox(width: 20),
@@ -127,29 +115,14 @@ class RegisterSelectionScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
                       const SizedBox(height: 8),
-                      Text(
-                        description,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                          height: 1.4,
-                        ),
-                      ),
+                      Text(description, style: TextStyle(color: Colors.grey.shade600, fontSize: 14, height: 1.4)),
                     ],
                   ),
                 ),
                 const SizedBox(width: 12),
-                Icon(Icons.arrow_forward_ios_rounded,
-                    size: 20, color: color.withValues(alpha: 0.5)),
+                Icon(Icons.arrow_forward_ios_rounded, size: 20, color: color.withValues(alpha: 0.5)),
               ],
             ),
           ),
