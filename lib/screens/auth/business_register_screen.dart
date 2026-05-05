@@ -35,7 +35,9 @@ class _BusinessType {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 class BusinessRegisterScreen extends StatefulWidget {
-  const BusinessRegisterScreen({super.key});
+  final bool isGoogle;
+
+  const BusinessRegisterScreen({super.key, this.isGoogle = false});
 
   @override
   State<BusinessRegisterScreen> createState() => _BusinessRegisterScreenState();
@@ -92,12 +94,20 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
 
     try {
       // 1. Crear usuario en Firebase + registrar en backend como BUSINESS_OWNER
-      await context.read<AppAuthProvider>().registerBusinessOwner(
-        email:    _emailCtrl.text.trim(),
-        password: _passwordCtrl.text,
-        name:     _contactNameCtrl.text.trim(),
-        phone:    _phoneCtrl.text.trim(),
-      );
+      if (widget.isGoogle) {
+        await context.read<AppAuthProvider>().completeGoogleSignUp(
+          role: 'BUSINESS_OWNER',
+          name: _contactNameCtrl.text.trim(),
+          phone: _phoneCtrl.text.trim(),
+        );
+      } else {
+        await context.read<AppAuthProvider>().registerBusinessOwner(
+          email:    _emailCtrl.text.trim(),
+          password: _passwordCtrl.text,
+          name:     _contactNameCtrl.text.trim(),
+          phone:    _phoneCtrl.text.trim(),
+        );
+      }
 
       // 2. Registrar el negocio en el backend
       await BusinessService.instance.registerBusiness(
@@ -202,53 +212,65 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
                 const SizedBox(height: 20),
 
                 // ── Email + Phone side by side ────────────────
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _buildField(
-                        controller: _emailCtrl,
-                        label: 'Correo electrónico',
-                        hint: 'contacto@negocio.com',
-                        icon: Icons.email_outlined,
-                        validator: _validateEmail,
-                        keyboard: TextInputType.emailAddress,
+                if (!widget.isGoogle) ...[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildField(
+                          controller: _emailCtrl,
+                          label: 'Correo electrónico',
+                          hint: 'contacto@negocio.com',
+                          icon: Icons.email_outlined,
+                          validator: _validateEmail,
+                          keyboard: TextInputType.emailAddress,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _buildField(
-                        controller: _phoneCtrl,
-                        label: 'Teléfono',
-                        hint: '+52 55 0000 0000',
-                        icon: Icons.phone_outlined,
-                        validator: _validatePhone,
-                        keyboard: TextInputType.phone,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildField(
+                          controller: _phoneCtrl,
+                          label: 'Teléfono',
+                          hint: '+52 55 0000 0000',
+                          icon: Icons.phone_outlined,
+                          validator: _validatePhone,
+                          keyboard: TextInputType.phone,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                // ── Passwords ─────────────────────────────────
-                _buildPasswordField(
-                  controller: _passwordCtrl,
-                  label: 'Contraseña',
-                  hint: 'Mínimo 8 caracteres',
-                  obscure: _obscurePassword,
-                  onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
-                  validator: _validatePassword,
-                ),
-                const SizedBox(height: 20),
-                _buildPasswordField(
-                  controller: _confirmCtrl,
-                  label: 'Confirmar contraseña',
-                  hint: 'Repite tu contraseña',
-                  obscure: _obscureConfirm,
-                  onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                  validator: _validateConfirm,
-                ),
-                const SizedBox(height: 32),
+                  // ── Passwords ─────────────────────────────────
+                  _buildPasswordField(
+                    controller: _passwordCtrl,
+                    label: 'Contraseña',
+                    hint: 'Mínimo 8 caracteres',
+                    obscure: _obscurePassword,
+                    onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                    validator: _validatePassword,
+                  ),
+                  const SizedBox(height: 20),
+                  _buildPasswordField(
+                    controller: _confirmCtrl,
+                    label: 'Confirmar contraseña',
+                    hint: 'Repite tu contraseña',
+                    obscure: _obscureConfirm,
+                    onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    validator: _validateConfirm,
+                  ),
+                  const SizedBox(height: 32),
+                ] else ...[
+                  _buildField(
+                    controller: _phoneCtrl,
+                    label: 'Teléfono',
+                    hint: '+52 55 0000 0000',
+                    icon: Icons.phone_outlined,
+                    validator: _validatePhone,
+                    keyboard: TextInputType.phone,
+                  ),
+                  const SizedBox(height: 32),
+                ],
 
                 // ── Submit ────────────────────────────────────
                 SizedBox(

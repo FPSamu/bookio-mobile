@@ -99,6 +99,19 @@ class AppAuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> completeGoogleSignUp({
+    required String role,
+    required String name,
+    String? phone,
+  }) async {
+    _user = await AuthService.instance.completeGoogleSignUp(
+      role: role,
+      name: name,
+      phone: phone,
+    );
+    notifyListeners();
+  }
+
   // ────────────────────── Logout ──────────────────────
 
   Future<void> logout() async {

@@ -73,21 +73,48 @@ class AuthService {
     final userCredential = await _auth.signInWithCredential(credential);
     final idToken = await userCredential.user!.getIdToken();
 
-    if (role != null) {
-      // Sign-up: crear usuario en el backend
-      final data = await _api.post('/auth/register', body: {
-        'idToken': idToken,
-        'role': role,
-        'name': name ?? userCredential.user!.displayName ?? '',
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-        if (userCredential.user!.photoURL != null)
-          'avatarUrl': userCredential.user!.photoURL,
-      });
-      return AppUser.fromJson(data['user'] as Map<String, dynamic>);
-    }
+    try {
+      if (role != null) {
+        // Sign-up: crear usuario en el backend
+        final data = await _api.post('/auth/register', body: {
+          'idToken': idToken,
+          'role': role,
+          'name': name ?? userCredential.user!.displayName ?? '',
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
+          if (userCredential.user!.photoURL != null)
+            'avatarUrl': userCredential.user!.photoURL,
+        });
+        return AppUser.fromJson(data['user'] as Map<String, dynamic>);
+      }
 
-    // Login: el usuario ya existe en el backend
-    return getMe();
+      // Login: el usuario ya existe en el backend
+      return await getMe();
+    } on ApiException catch (e) {
+      if (e.statusCode == 401 && role == null) {
+        throw UserNotRegisteredException();
+      }
+      rethrow;
+    }
+  }
+
+  /// Completa el registro usando la sesión actual de Google en Firebase.
+  Future<AppUser> completeGoogleSignUp({
+    required String role,
+    required String name,
+    String? phone,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No hay usuario autenticado en Firebase');
+    final idToken = await user.getIdToken();
+
+    final data = await _api.post('/auth/register', body: {
+      'idToken': idToken,
+      'role': role,
+      'name': name,
+      if (phone != null && phone.isNotEmpty) 'phone': phone,
+      if (user.photoURL != null) 'avatarUrl': user.photoURL,
+    });
+    return AppUser.fromJson(data['user'] as Map<String, dynamic>);
   }
 
   // ────────────────────── Perfil ──────────────────────
@@ -105,3 +132,7 @@ class AuthService {
     await _auth.signOut();
   }
 }
+
+/// Excepción lanzada cuando el usuario inicia sesión con Google en Firebase
+/// pero no tiene cuenta registrada en el backend.
+class UserNotRegisteredException implements Exception {}

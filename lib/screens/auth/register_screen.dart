@@ -4,7 +4,9 @@ import 'client_register_screen.dart';
 import 'business_register_screen.dart';
 
 class RegisterSelectionScreen extends StatelessWidget {
-  const RegisterSelectionScreen({super.key});
+  final bool isGoogle;
+
+  const RegisterSelectionScreen({super.key, this.isGoogle = false});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +52,7 @@ class RegisterSelectionScreen extends StatelessWidget {
                 color: Colors.indigo,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ClientRegisterScreen()),
+                  MaterialPageRoute(builder: (_) => ClientRegisterScreen(isGoogle: isGoogle)),
                 ),
               ),
               const SizedBox(height: 24),
@@ -64,7 +66,7 @@ class RegisterSelectionScreen extends StatelessWidget {
                 color: Colors.teal,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const BusinessRegisterScreen()),
+                  MaterialPageRoute(builder: (_) => BusinessRegisterScreen(isGoogle: isGoogle)),
                 ),
               ),
             ],

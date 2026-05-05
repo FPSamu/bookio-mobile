@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../services/auth_service.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -58,6 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await context.read<AppAuthProvider>().loginWithGoogle();
       // AuthGate redirige automáticamente
+    } on UserNotRegisteredException catch (_) {
+      // Navegar al selector de roles con bandera de Google
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const RegisterSelectionScreen(isGoogle: true)),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = _resolveFirebaseError(e.code));
     } catch (e) {
@@ -239,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const RegisterSelectionScreen()),
+                        MaterialPageRoute(builder: (_) => const RegisterSelectionScreen(isGoogle: false)),
                       ),
                       style: TextButton.styleFrom(foregroundColor: _primary),
                       child: const Text('Regístrate', style: TextStyle(fontWeight: FontWeight.bold)),

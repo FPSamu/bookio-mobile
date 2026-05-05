@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 
 class ClientRegisterScreen extends StatefulWidget {
-  const ClientRegisterScreen({super.key});
+  final bool isGoogle;
+
+  const ClientRegisterScreen({super.key, this.isGoogle = false});
 
   @override
   State<ClientRegisterScreen> createState() => _ClientRegisterScreenState();
@@ -69,11 +71,18 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
 
     try {
       // 1. Registrar
-      await context.read<AppAuthProvider>().registerClient(
-        name:     _nameCtrl.text.trim(),
-        email:    _emailCtrl.text.trim(),
-        password: _passwordCtrl.text,
-      );
+      if (widget.isGoogle) {
+        await context.read<AppAuthProvider>().completeGoogleSignUp(
+          role: 'CLIENT',
+          name: _nameCtrl.text.trim(),
+        );
+      } else {
+        await context.read<AppAuthProvider>().registerClient(
+          name:     _nameCtrl.text.trim(),
+          email:    _emailCtrl.text.trim(),
+          password: _passwordCtrl.text,
+        );
+      }
 
       // 2. Limpiar stack para que AuthGate muestre el dashboard
       if (mounted) {
@@ -161,36 +170,40 @@ class _ClientRegisterScreenState extends State<ClientRegisterScreen> {
                   autoComplete: 'name',
                 ),
                 const SizedBox(height: 20),
-                _buildField(
-                  controller: _emailCtrl,
-                  label: 'Correo electrónico',
-                  hint: 'ejemplo@correo.com',
-                  icon: Icons.email_outlined,
-                  validator: _validateEmail,
-                  keyboard: TextInputType.emailAddress,
-                  autoComplete: 'email',
-                ),
-                const SizedBox(height: 20),
-                _buildPasswordField(
-                  controller: _passwordCtrl,
-                  label: 'Contraseña',
-                  hint: 'Mínimo 8 caracteres',
-                  obscure: _obscurePassword,
-                  onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
-                  validator: _validatePassword,
-                  autoComplete: 'new-password',
-                ),
-                const SizedBox(height: 20),
-                _buildPasswordField(
-                  controller: _confirmCtrl,
-                  label: 'Confirmar contraseña',
-                  hint: 'Repite tu contraseña',
-                  obscure: _obscureConfirm,
-                  onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                  validator: _validateConfirm,
-                  autoComplete: 'new-password',
-                ),
-                const SizedBox(height: 32),
+                if (!widget.isGoogle) ...[
+                  _buildField(
+                    controller: _emailCtrl,
+                    label: 'Correo electrónico',
+                    hint: 'ejemplo@correo.com',
+                    icon: Icons.email_outlined,
+                    validator: _validateEmail,
+                    keyboard: TextInputType.emailAddress,
+                    autoComplete: 'email',
+                  ),
+                  const SizedBox(height: 20),
+                  _buildPasswordField(
+                    controller: _passwordCtrl,
+                    label: 'Contraseña',
+                    hint: 'Mínimo 8 caracteres',
+                    obscure: _obscurePassword,
+                    onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                    validator: _validatePassword,
+                    autoComplete: 'new-password',
+                  ),
+                  const SizedBox(height: 20),
+                  _buildPasswordField(
+                    controller: _confirmCtrl,
+                    label: 'Confirmar contraseña',
+                    hint: 'Repite tu contraseña',
+                    obscure: _obscureConfirm,
+                    onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                    validator: _validateConfirm,
+                    autoComplete: 'new-password',
+                  ),
+                  const SizedBox(height: 32),
+                ] else ...[
+                  const SizedBox(height: 12),
+                ],
 
                 // ── Submit ────────────────────────────────────
                 SizedBox(
