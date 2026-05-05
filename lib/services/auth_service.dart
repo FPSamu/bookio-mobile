@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -123,6 +124,21 @@ class AuthService {
   Future<AppUser> getMe() async {
     final data = await _api.get('/auth/me');
     return AppUser.fromJson(data['user'] as Map<String, dynamic>);
+  }
+
+  /// Actualiza nombre y/o teléfono del usuario actual.
+  Future<AppUser> updateProfile({String? name, String? phone}) async {
+    final body = <String, dynamic>{};
+    if (name != null && name.isNotEmpty) body['name'] = name;
+    if (phone != null && phone.isNotEmpty) body['phone'] = phone;
+    final data = await _api.put('/auth/me', body: body);
+    return AppUser.fromJson((data['user'] ?? data) as Map<String, dynamic>);
+  }
+
+  /// Sube una imagen de perfil al servidor (S3 vía backend).
+  Future<AppUser> uploadAvatar(File imageFile) async {
+    final data = await _api.uploadFile('/auth/avatar', imageFile, fieldName: 'avatar');
+    return AppUser.fromJson((data['user'] ?? data) as Map<String, dynamic>);
   }
 
   // ────────────────────── Logout ──────────────────────

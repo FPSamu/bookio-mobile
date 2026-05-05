@@ -1,61 +1,51 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 import 'api_config.dart';
 
-/// Cliente HTTP centralizado con inyección automática del token de Firebase.
-///
-/// Equivalente al `api.js` con interceptor de Axios del frontend web.
 class ApiService {
   ApiService._();
   static final ApiService instance = ApiService._();
 
   final String _baseUrl = ApiConfig.baseUrl;
 
-  // ──────────────────────────── Helpers ────────────────────────────
-
   Future<Map<String, String>> _headers() async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final token = await user.getIdToken();
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
+      if (token != null) headers['Authorization'] = 'Bearer $token';
     }
-
     return headers;
   }
 
   Uri _uri(String path, [Map<String, dynamic>? queryParams]) {
     final uri = Uri.parse('$_baseUrl$path');
     if (queryParams == null || queryParams.isEmpty) return uri;
-
-    return uri.replace(
-      queryParameters: queryParams.map(
-        (key, value) => MapEntry(key, value.toString()),
-      ),
-    );
+    return uri.replace(queryParameters: queryParams.map((k, v) => MapEntry(k, v.toString())));
   }
 
-  /// Parsea la respuesta y lanza excepciones descriptivas en caso de error.
   dynamic _handleResponse(http.Response response) {
-    final body = response.body.isNotEmpty ? jsonDecode(response.body) : null;
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return body;
+    dynamic body;
+    if (response.body.isNotEmpty) {
+      try {
+        body = jsonDecode(response.body);
+      } catch (_) {
+        if (response.statusCode >= 200 && response.statusCode < 300) return null;
+        throw ApiException(response.statusCode, 'Error ${response.statusCode}');
+      }
     }
-
-    final message = body is Map ? (body['message'] ?? body['error'] ?? 'Error desconocido') : 'Error desconocido';
+    if (response.statusCode >= 200 && response.statusCode < 300) return body;
+    final message = body is Map
+        ? (body['message'] ?? body['error'] ?? 'Error desconocido')
+        : 'Error desconocido';
     throw ApiException(response.statusCode, message.toString());
   }
-
-  // ──────────────────────────── HTTP Verbs ────────────────────────────
 
   Future<dynamic> get(String path, {Map<String, dynamic>? queryParams}) async {
     final response = await http.get(_uri(path, queryParams), headers: await _headers());
@@ -84,9 +74,19 @@ class ApiService {
     final response = await http.delete(_uri(path), headers: await _headers());
     return _handleResponse(response);
   }
+
+  Future<dynamic> uploadFile(String path, File file, {String fieldName = 'file'}) async {
+    final request = http.MultipartRequest('POST', _uri(path));
+    final hdrs = await _headers();
+    hdrs.remove('Content-Type');
+    request.headers.addAll(hdrs);
+    request.files.add(await http.MultipartFile.fromPath(fieldName, file.path));
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    return _handleResponse(response);
+  }
 }
 
-/// Excepción tipada para errores del API.
 class ApiException implements Exception {
   final int statusCode;
   final String message;

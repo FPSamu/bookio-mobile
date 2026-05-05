@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /Users/alanvarela/Documents/bookio-backend/ 2>/dev/null | head -20 && cat /Users/alanvarela/Documents/bookio-backend/src/routes/*.ts 2>/dev/null | grep -E \"upload|avatar|photo|image|s3\" | head -20)",
+      "Read(//Users/alanvarela/Documents/**)",
+      "Read(//Users/alanvarela/Documents/bookio-backend/src/**)",
+      "Bash(flutter analyze *)"
+    ]
+  }
+}

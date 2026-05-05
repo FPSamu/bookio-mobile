@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../services/business_service.dart';
+import 'package:geocoding/geocoding.dart';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,10 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
   bool _loading          = false;
   String? _apiError;
 
+  bool _locationVerified = false;
+  double? _lat;
+  double? _lng;
+
   @override
   void dispose() {
     _businessNameCtrl.dispose();
@@ -114,6 +119,8 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
         name:    _businessNameCtrl.text.trim(),
         type:    _businessType,
         address: _addressCtrl.text.trim(),
+        latitude: _lat,
+        longitude: _lng,
       );
 
       // 3. Limpiar stack para que AuthGate muestre el dashboard de negocio
@@ -146,10 +153,8 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -197,6 +202,56 @@ class _BusinessRegisterScreenState extends State<BusinessRegisterScreen> {
                   hint: 'Av. Presidente Masaryk 61, CDMX',
                   icon: Icons.location_on_outlined,
                   validator: (_) => null,
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: _locationVerified ? null : () async {
+                      final address = _addressCtrl.text.trim();
+                      if (address.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Por favor, ingresa una dirección primero.'), backgroundColor: Colors.orange),
+                        );
+                        return;
+                      }
+
+                      setState(() => _loading = true);
+                      try {
+                        List<Location> locations = await locationFromAddress(address);
+                        if (locations.isNotEmpty) {
+                          setState(() {
+                            _locationVerified = true;
+                            _lat = locations.first.latitude;
+                            _lng = locations.first.longitude;
+                            _loading = false;
+                          });
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ubicación verificada correctamente.'), backgroundColor: Colors.green),
+                            );
+                          }
+                        } else {
+                          throw Exception('No results');
+                        }
+                      } catch (e) {
+                        setState(() => _loading = false);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('No se pudo encontrar la dirección. Revisa que sea correcta.'), backgroundColor: Colors.red),
+                          );
+                        }
+                      }
+                    },
+                    icon: Icon(_locationVerified ? Icons.check_circle : Icons.location_searching),
+                    label: Text(_locationVerified ? 'Ubicación verificada' : 'Verificar ubicación'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _locationVerified ? Colors.green : Colors.indigo.shade50,
+                      foregroundColor: _locationVerified ? Colors.white : Colors.indigo.shade700,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
 

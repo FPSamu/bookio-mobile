@@ -112,6 +112,13 @@ class AppAuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ────────────────────── Profile update ──────────────────────
+
+  void setUser(AppUser user) {
+    _user = user;
+    notifyListeners();
+  }
+
   // ────────────────────── Logout ──────────────────────
 
   Future<void> logout() async {
