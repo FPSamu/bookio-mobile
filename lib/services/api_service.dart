@@ -10,8 +10,9 @@ class ApiService {
   static final ApiService instance = ApiService._();
 
   final String _baseUrl = ApiConfig.baseUrl;
+  String get baseUrl => _baseUrl;
 
-  Future<Map<String, String>> _headers() async {
+  Future<Map<String, String>> headers() async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -48,14 +49,14 @@ class ApiService {
   }
 
   Future<dynamic> get(String path, {Map<String, dynamic>? queryParams}) async {
-    final response = await http.get(_uri(path, queryParams), headers: await _headers());
+    final response = await http.get(_uri(path, queryParams), headers: await headers());
     return _handleResponse(response);
   }
 
   Future<dynamic> post(String path, {Map<String, dynamic>? body}) async {
     final response = await http.post(
       _uri(path),
-      headers: await _headers(),
+      headers: await headers(),
       body: body != null ? jsonEncode(body) : null,
     );
     return _handleResponse(response);
@@ -64,20 +65,20 @@ class ApiService {
   Future<dynamic> put(String path, {Map<String, dynamic>? body}) async {
     final response = await http.put(
       _uri(path),
-      headers: await _headers(),
+      headers: await headers(),
       body: body != null ? jsonEncode(body) : null,
     );
     return _handleResponse(response);
   }
 
   Future<dynamic> delete(String path) async {
-    final response = await http.delete(_uri(path), headers: await _headers());
+    final response = await http.delete(_uri(path), headers: await headers());
     return _handleResponse(response);
   }
 
-  Future<dynamic> uploadFile(String path, File file, {String fieldName = 'file'}) async {
-    final request = http.MultipartRequest('POST', _uri(path));
-    final hdrs = await _headers();
+  Future<dynamic> uploadFile(String path, File file, {String fieldName = 'file', String method = 'POST'}) async {
+    final request = http.MultipartRequest(method, _uri(path));
+    final hdrs = await headers();
     hdrs.remove('Content-Type');
     request.headers.addAll(hdrs);
     request.files.add(await http.MultipartFile.fromPath(fieldName, file.path));

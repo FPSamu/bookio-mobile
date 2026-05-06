@@ -24,8 +24,7 @@ class BusinessCard extends StatelessWidget {
 
   String get _typeLabel => _typeLabels[business.type] ?? business.type;
 
-  String get _imageUrl =>
-      business.photos.isNotEmpty ? business.photos.first : (business.logoUrl ?? '');
+  String? get _photoUrl => business.photos.isNotEmpty ? business.photos.first : null;
 
   @override
   Widget build(BuildContext context) {
@@ -65,21 +64,19 @@ class BusinessCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    final imageWidget = _imageUrl.isNotEmpty
-        ? Image.network(
-            _imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => const Icon(Icons.store, color: Colors.grey, size: 32),
-          )
-        : const Icon(Icons.store, color: Colors.grey, size: 32);
-
     final child = ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: Container(
         width: 90,
         height: 90,
         color: Colors.grey.shade200,
-        child: imageWidget,
+        child: _photoUrl != null
+            ? Image.network(
+                _photoUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const Icon(Icons.store, color: Colors.grey, size: 32),
+              )
+            : const Icon(Icons.store, color: Colors.grey, size: 32),
       ),
     );
 

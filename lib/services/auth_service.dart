@@ -130,15 +130,18 @@ class AuthService {
   Future<AppUser> updateProfile({String? name, String? phone}) async {
     final body = <String, dynamic>{};
     if (name != null && name.isNotEmpty) body['name'] = name;
-    if (phone != null && phone.isNotEmpty) body['phone'] = phone;
-    final data = await _api.put('/auth/me', body: body);
+    if (phone != null) body['phone'] = phone.isEmpty ? null : phone;
+    final data = await _api.put('/users/profile', body: body);
     return AppUser.fromJson((data['user'] ?? data) as Map<String, dynamic>);
   }
 
-  /// Sube una imagen de perfil al servidor (S3 vía backend).
+  /// Sube una imagen de perfil al bucket S3 vía backend.
   Future<AppUser> uploadAvatar(File imageFile) async {
-    final data = await _api.uploadFile('/auth/avatar', imageFile, fieldName: 'avatar');
-    return AppUser.fromJson((data['user'] ?? data) as Map<String, dynamic>);
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) throw Exception('No hay usuario autenticado');
+    await _api.uploadFile('/users/$uid/avatar', imageFile, fieldName: 'photo', method: 'PATCH');
+    // Backend returns { avatar_url }; fetch full profile to get updated AppUser
+    return await getMe();
   }
 
   // ────────────────────── Logout ──────────────────────

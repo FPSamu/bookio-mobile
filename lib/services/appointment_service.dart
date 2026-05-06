@@ -7,9 +7,14 @@ class AppointmentService {
 
   final ApiService _api = ApiService.instance;
 
-  Future<List<AppointmentModel>> getAppointments({String? status}) async {
-    final query = status != null ? '?status=$status' : '';
-    final data = await _api.get('/appointments$query');
+  Future<List<AppointmentModel>> getAppointments({String? status, String? businessId, String? clientId}) async {
+    final Map<String, String> queryParams = {};
+    if (status != null) queryParams['status'] = status;
+    if (businessId != null) queryParams['businessId'] = businessId;
+    if (clientId != null) queryParams['clientId'] = clientId;
+
+    final queryString = queryParams.isEmpty ? '' : '?${Uri(queryParameters: queryParams).query}';
+    final data = await _api.get('/appointments$queryString');
     final List<dynamic> listJson = data['data'] ?? data['appointments'] ?? (data is List ? data : []);
     return listJson.map((json) => AppointmentModel.fromJson(json as Map<String, dynamic>)).toList();
   }
@@ -23,6 +28,24 @@ class AppointmentService {
       'businessId': businessId,
       'serviceId': serviceId,
       'startDatetime': startDatetime.toIso8601String(),
+    });
+    final dynamic aptJson = data['appointment'] ?? data['data'] ?? data;
+    return AppointmentModel.fromJson(aptJson as Map<String, dynamic>);
+  }
+
+  Future<AppointmentModel> createManualAppointment({
+    required String businessId,
+    required String serviceId,
+    required DateTime startDatetime,
+    required String clientName,
+    String? clientPhone,
+  }) async {
+    final data = await _api.post('/appointments/manual', body: {
+      'businessId': businessId,
+      'serviceId': serviceId,
+      'startDatetime': startDatetime.toIso8601String(),
+      'clientName': clientName,
+      if (clientPhone != null && clientPhone.isNotEmpty) 'clientPhone': clientPhone,
     });
     final dynamic aptJson = data['appointment'] ?? data['data'] ?? data;
     return AppointmentModel.fromJson(aptJson as Map<String, dynamic>);

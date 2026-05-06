@@ -58,7 +58,7 @@ Podemos actualizar esta política ocasionalmente. Te notificaremos sobre cambios
           _section(context, '9. Contacto', '''
 Para preguntas sobre privacidad:
 📧 privacidad@bookio.app
-📍 Ciudad de México, México'''),
+📍 Zapopan, Jalisco, México'''),
 
           const SizedBox(height: 32),
         ],

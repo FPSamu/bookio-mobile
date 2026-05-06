@@ -39,7 +39,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (source == null) return;
 
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: source, maxWidth: 800, imageQuality: 85);
+    XFile? image;
+    try {
+      image = await picker.pickImage(source: source, maxWidth: 800, imageQuality: 85);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(source == ImageSource.camera
+              ? 'Cámara no disponible en este dispositivo'
+              : 'No se pudo acceder a la galería'),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
+      return;
+    }
     if (image == null || !mounted) return;
 
     setState(() => _isUploadingAvatar = true);

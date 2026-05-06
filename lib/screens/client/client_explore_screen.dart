@@ -25,8 +25,18 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AppointmentProvider>().fetchAppointments();
-      context.read<BusinessProvider>().fetchBusinesses();
+      final bp = context.read<BusinessProvider>();
+      bp.fetchBusinesses();
+      bp.fetchFavorites();
     });
+  }
+
+  Future<void> _onRefresh() async {
+    await Future.wait([
+      context.read<BusinessProvider>().fetchBusinesses(),
+      context.read<AppointmentProvider>().fetchAppointments(),
+      context.read<BusinessProvider>().fetchFavorites(),
+    ]);
   }
 
   @override
@@ -51,8 +61,11 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
@@ -248,6 +261,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
           ],
         ),
       ),
+      ),
     );
   }
 
@@ -404,84 +418,98 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
   }
 
   Widget _buildRecentBusinesses(BuildContext context) {
-    final recent = StorageService.instance.getRecentBusinesses();
-    if (recent.isEmpty) return const SizedBox.shrink();
+    return Consumer<BusinessProvider>(
+      builder: (context, provider, _) {
+        final cached = StorageService.instance.getRecentBusinesses();
+        if (cached.isEmpty) return const SizedBox.shrink();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Text(
-            'Vistos Recientemente',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          height: 160,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: recent.length,
-            itemBuilder: (context, index) {
-              final b = recent[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => BusinessDetailScreen(business: b)));
-                },
-                child: Container(
-                  width: 140,
-                  margin: const EdgeInsets.symmetric(horizontal: 6),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 90,
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                          image: b.photos.isNotEmpty ? DecorationImage(
-                            image: NetworkImage(b.photos.first),
-                            fit: BoxFit.cover,
-                          ) : null,
-                          color: Colors.grey.shade300,
-                        ),
-                        child: b.photos.isEmpty ? const Center(child: Icon(Icons.store, color: Colors.grey)) : null,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(b.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                            const SizedBox(height: 2),
-                            Row(
-                              children: [
-                                Icon(Icons.star, size: 12, color: Colors.amber.shade600),
-                                const SizedBox(width: 2),
-                                Text(b.averageRating.toStringAsFixed(1), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                              ],
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
+        // Prefer fresh data from provider when available (avoids stale ratings)
+        final allFresh = [...provider.businesses, ...provider.recommendedBusinesses];
+        final recent = cached.map((b) {
+          try {
+            return allFresh.firstWhere((f) => f.id == b.id);
+          } catch (_) {
+            return b;
+          }
+        }).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(
+                'Vistos Recientemente',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-              );
-            },
-          ),
-        ),
-      ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 160,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: recent.length,
+                itemBuilder: (context, index) {
+                  final b = recent[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => BusinessDetailScreen(business: b)));
+                    },
+                    child: Container(
+                      width: 140,
+                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 90,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                              image: b.photos.isNotEmpty ? DecorationImage(
+                                image: NetworkImage(b.photos.first),
+                                fit: BoxFit.cover,
+                              ) : null,
+                              color: Colors.grey.shade300,
+                            ),
+                            child: b.photos.isEmpty ? const Center(child: Icon(Icons.store, color: Colors.grey)) : null,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(b.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Icon(Icons.star, size: 12, color: Colors.amber.shade600),
+                                    const SizedBox(width: 2),
+                                    Text(b.averageRating.toStringAsFixed(1), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ],
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

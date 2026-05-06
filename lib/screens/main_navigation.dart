@@ -5,6 +5,7 @@ import 'business/admin_calendar.dart';
 import 'business/services.dart';
 import 'client/client_explore_screen.dart';
 import 'client/favorites_screen.dart';
+import 'client/map_screen.dart';
 import 'business/metrics_screen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -44,6 +45,7 @@ class _MainNavigationState extends State<MainNavigation> {
           ]
         : const [
             NavigationDestination(icon: Icon(Icons.search), label: 'Explorar'),
+            NavigationDestination(icon: Icon(Icons.map_outlined), selectedIcon: Icon(Icons.map), label: 'Mapa'),
             NavigationDestination(
               icon: Icon(Icons.favorite_border),
               selectedIcon: Icon(Icons.favorite),
@@ -62,6 +64,7 @@ class _MainNavigationState extends State<MainNavigation> {
           ]
         : [
             const ClientExploreScreen(),
+            const MapScreen(),
             const FavoritesScreen(),
             const AppointmentsScreen(),
             const SettingsScreen(isBusiness: false),

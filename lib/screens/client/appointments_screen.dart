@@ -349,7 +349,7 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                   await appointmentProvider.submitReview(
                     appointmentId: apt.id,
                     businessId: apt.businessId,
-                    clientId: apt.clientId,
+                    clientId: apt.clientId ?? '',
                     score: selectedRating,
                     comment: reviewText,
                   );

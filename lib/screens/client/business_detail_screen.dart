@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../models/business_model.dart';
 import '../../models/appointment_model.dart';
 import '../../services/business_service.dart';
+import '../../providers/business_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'booking_screen.dart';
 import '../../services/storage_service.dart';
@@ -23,8 +25,6 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
   bool _isLoadingServices = true;
   bool _isLoadingSchedule = true;
   bool _isLoadingReviews = true;
-  bool _isFavorite = false;
-
   static const _dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   static const _dayNamesFull = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -34,13 +34,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     _fetchServices();
     _fetchSchedule();
     _fetchReviews();
-    _isFavorite = StorageService.instance.isFavorite(widget.business.id);
     StorageService.instance.addRecentBusiness(widget.business);
-  }
-
-  void _toggleFavorite() async {
-    await StorageService.instance.toggleFavorite(widget.business);
-    setState(() => _isFavorite = StorageService.instance.isFavorite(widget.business.id));
   }
 
   Future<void> _launchMaps() async {
@@ -191,18 +185,23 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
               ),
             ),
             actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                  backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
-                  child: IconButton(
-                    icon: Icon(
-                      _isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: _isFavorite ? Colors.redAccent : cs.onSurface,
+              Consumer<BusinessProvider>(
+                builder: (context, bp, _) {
+                  final fav = bp.isFavorite(widget.business.id);
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircleAvatar(
+                      backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
+                      child: IconButton(
+                        icon: Icon(
+                          fav ? Icons.favorite : Icons.favorite_border,
+                          color: fav ? Colors.redAccent : cs.onSurface,
+                        ),
+                        onPressed: () => bp.toggleFavorite(widget.business.id, widget.business),
+                      ),
                     ),
-                    onPressed: _toggleFavorite,
-                  ),
-                ),
+                  );
+                },
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -514,7 +513,7 @@ class _BusinessDetailScreenState extends State<BusinessDetailScreen> {
     final score = (review['score'] as num?)?.toDouble() ?? 0;
     final comment = review['comment'] as String?;
     final clientName = (review['client']?['name'] ?? 'Cliente') as String;
-    final dateStr = review['created_at'] as String?;
+    final dateStr = (review['createdAt'] ?? review['created_at']) as String?;
     String dateFormatted = '';
     if (dateStr != null) {
       final date = DateTime.tryParse(dateStr);

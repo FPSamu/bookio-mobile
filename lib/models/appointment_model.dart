@@ -1,36 +1,12 @@
 import 'business_model.dart';
 import 'user_model.dart';
 
-class ServiceModel {
-  final String id;
-  final String name;
-  final int durationMinutes;
-  final double price;
-  final String? photoUrl;
-
-  ServiceModel({
-    required this.id,
-    required this.name,
-    required this.durationMinutes,
-    required this.price,
-    this.photoUrl,
-  });
-
-  factory ServiceModel.fromJson(Map<String, dynamic> json) {
-    return ServiceModel(
-      id: json['id'],
-      name: json['name'],
-      durationMinutes: json['duration_minutes'] ?? 0,
-      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
-      photoUrl: json['photo_url'],
-    );
-  }
-}
-
 class AppointmentModel {
   final String id;
   final String businessId;
-  final String clientId;
+  final String? clientId;
+  final String? clientName;
+  final String? clientPhone;
   final String serviceId;
   final DateTime startDatetime;
   final DateTime endDatetime;
@@ -45,7 +21,9 @@ class AppointmentModel {
   AppointmentModel({
     required this.id,
     required this.businessId,
-    required this.clientId,
+    this.clientId,
+    this.clientName,
+    this.clientPhone,
     required this.serviceId,
     required this.startDatetime,
     required this.endDatetime,
@@ -62,6 +40,8 @@ class AppointmentModel {
       id: json['id'],
       businessId: json['business_id'],
       clientId: json['client_id'],
+      clientName: json['client_name'],
+      clientPhone: json['client_phone'],
       serviceId: json['service_id'],
       startDatetime: DateTime.parse(json['start_datetime']),
       endDatetime: DateTime.parse(json['end_datetime']),
@@ -78,6 +58,8 @@ class AppointmentModel {
     String? id,
     String? businessId,
     String? clientId,
+    String? clientName,
+    String? clientPhone,
     String? serviceId,
     DateTime? startDatetime,
     DateTime? endDatetime,
@@ -92,6 +74,8 @@ class AppointmentModel {
       id: id ?? this.id,
       businessId: businessId ?? this.businessId,
       clientId: clientId ?? this.clientId,
+      clientName: clientName ?? this.clientName,
+      clientPhone: clientPhone ?? this.clientPhone,
       serviceId: serviceId ?? this.serviceId,
       startDatetime: startDatetime ?? this.startDatetime,
       endDatetime: endDatetime ?? this.endDatetime,

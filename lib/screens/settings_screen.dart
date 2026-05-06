@@ -6,6 +6,10 @@ import 'client/edit_profile_screen.dart';
 import 'client/notifications_screen.dart';
 import 'client/help_center_screen.dart';
 import 'client/privacy_policy_screen.dart';
+import '../providers/business_provider.dart';
+import 'business/edit_business_screen.dart';
+import 'business/business_qr_screen.dart';
+import 'client/business_detail_screen.dart';
 import '../widgets/pending_feature_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -201,10 +205,28 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                 if (widget.isBusiness) ...[
                   _sectionTitle('MI NEGOCIO'),
                   _card([
+                    _tile(context, 'Configuración del Negocio', Icons.settings_applications_outlined, cs,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const EditBusinessScreen()),
+                        ),
+                      ),
+                      _divider(),
+                      _divider(),
                     _tile(context, 'Ver Perfil (Vista Cliente)', Icons.remove_red_eye_outlined, cs,
                       iconColor: Colors.teal,
                       iconBg: Colors.teal.shade50,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PendingFeatureWidget(featureName: 'Vista Cliente'))),
+                      onTap: () {
+                        final business = context.read<BusinessProvider>().myBusiness;
+                        if (business != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => BusinessDetailScreen(business: business)),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se encontró información del negocio')));
+                        }
+                      },
                     ),
                   ]),
                   const SizedBox(height: 24),

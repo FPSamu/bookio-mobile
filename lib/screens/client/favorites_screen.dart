@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../services/storage_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/business_provider.dart';
 import '../../widgets/business_card.dart';
 import 'business_detail_screen.dart';
 
@@ -12,16 +13,29 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BusinessProvider>().fetchFavorites();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final favs = StorageService.instance.getFavorites();
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis Favoritos', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
-      body: favs.isEmpty
-          ? Center(
+      body: Consumer<BusinessProvider>(
+        builder: (context, provider, _) {
+          if (provider.favoritesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final favs = provider.favoriteBusinesses;
+          if (favs.isEmpty) {
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -39,8 +53,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 ],
               ),
-            )
-          : ListView.builder(
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchFavorites(),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.only(top: 8, bottom: 32),
               itemCount: favs.length,
               itemBuilder: (context, index) {
@@ -52,11 +70,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       context,
                       MaterialPageRoute(builder: (_) => BusinessDetailScreen(business: business)),
                     );
-                    setState(() {}); // refresh in case it was unfavorited
+                    if (context.mounted) provider.fetchFavorites();
                   },
                 );
               },
             ),
+          );
+        },
+      ),
     );
   }
 }

@@ -28,6 +28,50 @@ Actualmente, muchas Pequeñas y Medianas Empresas (PyMEs) del sector servicios (
 
 ---
 
+## 🛠 Tecnologías Utilizadas
+
+### Frontend (Mobile)
+* **Flutter & Dart**: Framework principal para el desarrollo multiplataforma (iOS/Android).
+* **Provider**: Gestión de estado robusta y escalable.
+* **Firebase Auth**: Autenticación segura con Email y Google Sign-In.
+
+### Backend & Almacenamiento
+* **NestJS (Node.js)**: API REST robusta y modular.
+* **Prisma ORM**: Gestión de base de datos eficiente con PostgreSQL.
+* **AWS S3**: Almacenamiento de imágenes (logos de negocios, fotos de servicios).
+* **OpenStreetMap (OSM)**: Servicio de mapas para geolocalización.
+
+---
+
+## 📦 Paquetes de Flutter
+A continuación se listan los paquetes adicionales utilizados para potenciar la funcionalidad de la app:
+
+| Paquete | Descripción |
+| :--- | :--- |
+| `table_calendar` | Calendario interactivo central para visualizar disponibilidad y seleccionar citas. |
+| `intl` | Localización y formateo de fechas, horas y moneda (pesos mexicanos). |
+| `provider` | Inyección de dependencias y manejo de estado global de la aplicación. |
+| `flutter_map` & `latlong2` | Integración del mapa interactivo basado en OpenStreetMap. |
+| `qr_flutter` | Generación de códigos QR únicos para el check-in de citas. |
+| `mobile_scanner` | Escaneo de códigos QR para la validación de asistencia en tiempo real. |
+| `image_picker` | Selección de fotos de perfil, logos y galería desde el dispositivo. |
+| `geocoding` & `geolocator` | Conversión de direcciones a coordenadas y obtención de ubicación actual. |
+| `http` | Comunicación fluida con nuestra API REST personalizada. |
+| `google_sign_in` | Acceso rápido y seguro mediante cuentas de Google. |
+| `shared_preferences` | Persistencia de datos locales básicos (tokens de sesión, preferencias). |
+
+## Factor WOW
+
+Nuestra aplicación destaca por dos funcionalidades clave que transforman la experiencia de usuario:
+
+### Mapa Interactivo
+Integración de un mapa dinámico que permite a los clientes descubrir negocios locales cercanos en tiempo real. No solo es una lista, es una experiencia visual para encontrar el servicio perfecto basándose en la ubicación.
+
+### Check-in con QR
+Automatización total de la llegada. Cada cita genera un código QR único. Al llegar al local, el dueño escanea el código desde la misma app y el estado de la cita cambia a "En curso" o "Completada".
+
+---
+
 ## 📱 Flujos de la Aplicación Móvil
 El desarrollo de la aplicación se centra en flujos principales diseñados para brindar una excelente experiencia de usuario (UX):
 
@@ -67,3 +111,5 @@ La aplicación está construida utilizando **Flutter** y respeta una estricta se
    ```
 
 *Nota: Para verificar que tu entorno se encuentra listo, puedes usar el comando `flutter doctor`.*
+
+
