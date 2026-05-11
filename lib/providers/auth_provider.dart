@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; // <-- NUEVO IMPORT
 import 'package:flutter/material.dart';
 
 import '../models/user_model.dart';
@@ -12,10 +13,10 @@ class AppAuthProvider extends ChangeNotifier {
   AppUser? _user;
   bool _isLoading = true;
 
-  AppUser? get user        => _user;
-  bool get isLoading       => _isLoading;
+  AppUser? get user => _user;
+  bool get isLoading => _isLoading;
   bool get isAuthenticated => _user != null;
-  String get role          => _user?.role ?? '';
+  String get role => _user?.role ?? '';
 
   AppAuthProvider() {
     _listenToAuthState();
@@ -37,8 +38,17 @@ class AppAuthProvider extends ChangeNotifier {
 
     try {
       _user = await AuthService.instance.getMe();
+
+      if (_user?.role == 'BUSINESS_OWNER' && _user?.businessId != null) {
+        try {
+          String topic = 'negocio_${_user!.businessId}';
+          await FirebaseMessaging.instance.subscribeToTopic(topic);
+          print('Dispositivo suscrito exitosamente al topic: $topic');
+        } catch (e) {
+          print('Error al suscribirse al topic: $e');
+        }
+      }
     } catch (_) {
-      // 401: Firebase session exists but user not in backend yet (first visit)
       _user = null;
     } finally {
       _isLoading = false;
@@ -122,6 +132,18 @@ class AppAuthProvider extends ChangeNotifier {
   // ────────────────────── Logout ──────────────────────
 
   Future<void> logout() async {
+
+    if (_user?.role == 'BUSINESS_OWNER' && _user?.businessId != null) {
+      try {
+        String topic = 'negocio_${_user!.businessId}';
+        await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+        print('Dispositivo desuscrito del topic: $topic');
+      } catch (e) {
+        print('Error al desuscribirse: $e');
+      }
+    }
+    //Desuscripción 
+
     await AuthService.instance.logout();
     _user = null;
     notifyListeners();

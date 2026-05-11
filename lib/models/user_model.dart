@@ -3,9 +3,11 @@ class AppUser {
   final String id;
   final String email;
   final String name;
-  final String role;       // 'CLIENT' | 'BUSINESS_OWNER'
+  final String role; // 'CLIENT' | 'BUSINESS_OWNER'
   final String? phone;
   final String? avatarUrl;
+
+  final String? businessId;
 
   const AppUser({
     required this.id,
@@ -14,19 +16,31 @@ class AppUser {
     required this.role,
     this.phone,
     this.avatarUrl,
+    this.businessId,
   });
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
+    String? extractedBusinessId;
+
+    if (json['businesses'] != null && (json['businesses'] as List).isNotEmpty) {
+      extractedBusinessId = json['businesses'][0]['id']?.toString();
+    } else {
+      extractedBusinessId =
+          json['businessId']?.toString() ?? json['business_id']?.toString();
+    }
+
     return AppUser(
-      id:        json['id']?.toString()    ?? '',
-      email:     json['email']?.toString() ?? '',
-      name:      json['name']?.toString()  ?? '',
-      role:      json['role']?.toString()  ?? 'CLIENT',
-      phone:     json['phone']?.toString(),
-      avatarUrl: json['avatar_url']?.toString() ?? json['avatarUrl']?.toString(),
+      id: json['id']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'CLIENT',
+      phone: json['phone']?.toString(),
+      avatarUrl:
+          json['avatar_url']?.toString() ?? json['avatarUrl']?.toString(),
+      businessId: extractedBusinessId,
     );
   }
 
   bool get isBusinessOwner => role == 'BUSINESS_OWNER';
-  bool get isClient        => role == 'CLIENT';
+  bool get isClient => role == 'CLIENT';
 }
