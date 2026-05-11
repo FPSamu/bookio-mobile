@@ -23,13 +23,20 @@ class AppointmentProvider extends ChangeNotifier {
             a.status == 'COMPLETED';
       }).toList();
 
-  Future<void> fetchAppointments() async {
+  void clear() {
+    _appointments = [];
+    _isLoading = false;
+    _error = null;
+    notifyListeners();
+  }
+
+  Future<void> fetchAppointments({String? clientId}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _appointments = await AppointmentService.instance.getAppointments();
+      _appointments = await AppointmentService.instance.getAppointments(clientId: clientId);
       _appointments.sort((a, b) => a.startDatetime.compareTo(b.startDatetime));
     } catch (e) {
       _error = e.toString();

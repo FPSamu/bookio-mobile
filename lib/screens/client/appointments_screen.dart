@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../models/appointment_model.dart';
 import '../../providers/appointment_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/business_provider.dart';
 import '../../services/storage_service.dart';
 import 'appointment_detail_screen.dart';
@@ -24,7 +25,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AppointmentProvider>().fetchAppointments();
+      final uid = context.read<AppAuthProvider>().user?.id;
+      context.read<AppointmentProvider>().fetchAppointments(clientId: uid);
     });
   }
 
