@@ -51,3 +51,6 @@ android/app/google-services.json
 
 # Environment variables
 .env
+
+# Claude Code
+.claude/
