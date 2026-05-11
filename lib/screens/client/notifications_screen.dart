@@ -26,71 +26,99 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    final items = [
-      _NotifItem(key: 'new_appointment', icon: Icons.event_available_outlined, title: 'Nueva cita', subtitle: 'Cuando una cita es agendada'),
-      _NotifItem(key: 'reminder',       icon: Icons.alarm_outlined,            title: 'Recordatorio', subtitle: '24 horas antes de la cita'),
-      _NotifItem(key: 'cancellation',   icon: Icons.cancel_outlined,           title: 'Cancelación', subtitle: 'Cuando una cita es cancelada'),
-      _NotifItem(key: 'news',           icon: Icons.campaign_outlined,         title: 'Novedades', subtitle: 'Promociones y actualizaciones de Bookio'),
-    ];
-
     return Scaffold(
       appBar: AppBar(title: const Text('Notificaciones')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: cs.secondaryContainer.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(14),
+          _sectionTitle('AVISOS', cs),
+          _card([
+            _switchTile(
+              cs,
+              key: 'new_appointment',
+              icon: Icons.event_available_outlined,
+              title: 'Nueva cita',
+              subtitle: 'Confirmación al agendar',
             ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: cs.secondary, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Las notificaciones push requieren permiso del sistema.',
-                    style: TextStyle(fontSize: 13, color: cs.onSurface.withValues(alpha: 0.7)),
-                  ),
-                ),
-              ],
+            _divider(),
+            _switchTile(
+              cs,
+              key: 'cancellation',
+              icon: Icons.cancel_outlined,
+              title: 'Cancelación',
+              subtitle: 'Cuando el negocio cancela tu cita',
             ),
-          ),
-          const SizedBox(height: 16),
-          ...items.map((item) => _buildTile(context, cs, item)),
+          ]),
+          const SizedBox(height: 20),
+
+          _sectionTitle('RECORDATORIOS', cs),
+          _card([
+            _switchTile(
+              cs,
+              key: 'reminder',
+              icon: Icons.alarm_outlined,
+              title: 'Recordatorio de cita',
+              subtitle: 'Notificación antes de cada cita',
+            ),
+          ]),
         ],
       ),
     );
   }
 
-  Widget _buildTile(BuildContext context, ColorScheme cs, _NotifItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5)),
+  Widget _sectionTitle(String title, ColorScheme cs) => Padding(
+    padding: const EdgeInsets.only(left: 4, bottom: 10),
+    child: Text(
+      title,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: cs.onSurface.withValues(alpha: 0.4),
+        letterSpacing: 1.2,
       ),
-      child: SwitchListTile(
-        secondary: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),
-          child: Icon(item.icon, size: 20, color: cs.onSurface.withValues(alpha: 0.7)),
+    ),
+  );
+
+  Widget _card(List<Widget> children) => Container(
+    decoration: BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Colors.white.withValues(alpha: 0.06)
+            : Colors.grey.shade100,
+      ),
+    ),
+    child: Column(children: children),
+  );
+
+  Widget _divider() => Divider(
+    height: 1,
+    thickness: 1,
+    color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+    indent: 56,
+  );
+
+  Widget _switchTile(ColorScheme cs, {
+    required String key,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return SwitchListTile(
+      secondary: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(10),
         ),
-        title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
-        subtitle: Text(item.subtitle, style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.5))),
-        value: _prefs[item.key] ?? false,
-        activeThumbColor: cs.secondary,
-        onChanged: (v) => _toggle(item.key, v),
+        child: Icon(icon, size: 20, color: cs.onSurface.withValues(alpha: 0.7)),
       ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15)),
+      subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.5))),
+      value: _prefs[key] ?? false,
+      activeThumbColor: cs.secondary,
+      onChanged: (v) => _toggle(key, v),
     );
   }
-}
-
-class _NotifItem {
-  final String key;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  const _NotifItem({required this.key, required this.icon, required this.title, required this.subtitle});
 }

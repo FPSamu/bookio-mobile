@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/appointment_provider.dart';
+import '../providers/business_provider.dart';
 import 'client/appointments_screen.dart';
 import 'settings_screen.dart';
 import 'business/admin_calendar.dart';
@@ -25,6 +28,8 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+    context.read<AppointmentProvider>().clear();
+    context.read<BusinessProvider>().clear();
   }
 
   @override

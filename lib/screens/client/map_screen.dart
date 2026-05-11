@@ -14,8 +14,10 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
 
   // Default center: Guadalajara, México
   static const LatLng _defaultCenter = LatLng(20.6597, -103.3496);
@@ -28,7 +30,18 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 1))
+      ..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
     _getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -172,18 +185,38 @@ class _MapScreenState extends State<MapScreen> {
                       if (_currentLocation != null)
                         Marker(
                           point: _currentLocation!,
-                          width: 48,
-                          height: 48,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
-                              boxShadow: [
-                                BoxShadow(color: Colors.blueAccent.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 4),
+                          width: 64,
+                          height: 64,
+                          child: AnimatedBuilder(
+                            animation: _pulseAnim,
+                            builder: (_, _) => Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // anillo pulsante
+                                Container(
+                                  width: 64 * _pulseAnim.value,
+                                  height: 64 * _pulseAnim.value,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.green.withValues(alpha: (1 - _pulseAnim.value) * 0.5),
+                                  ),
+                                ),
+                                // punto central
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 3),
+                                    boxShadow: [
+                                      BoxShadow(color: Colors.green.withValues(alpha: 0.4), blurRadius: 6, spreadRadius: 2),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.person, color: Colors.white, size: 18),
+                                ),
                               ],
                             ),
-                            child: const Icon(Icons.person, color: Colors.white, size: 24),
                           ),
                         ),
                     ],

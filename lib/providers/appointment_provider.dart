@@ -12,20 +12,31 @@ class AppointmentProvider extends ChangeNotifier {
   String? get error => _error;
 
   List<AppointmentModel> get upcomingAppointments => _appointments.where((a) {
-        return a.startDatetime.isAfter(DateTime.now()) && a.status != 'CANCELLED';
+        return a.startDatetime.isAfter(DateTime.now()) &&
+            a.status != 'CANCELLED' &&
+            a.status != 'COMPLETED';
       }).toList();
 
   List<AppointmentModel> get pastAppointments => _appointments.where((a) {
-        return a.startDatetime.isBefore(DateTime.now()) || a.status == 'CANCELLED';
+        return a.startDatetime.isBefore(DateTime.now()) ||
+            a.status == 'CANCELLED' ||
+            a.status == 'COMPLETED';
       }).toList();
 
-  Future<void> fetchAppointments() async {
+  void clear() {
+    _appointments = [];
+    _isLoading = false;
+    _error = null;
+    notifyListeners();
+  }
+
+  Future<void> fetchAppointments({String? clientId}) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _appointments = await AppointmentService.instance.getAppointments();
+      _appointments = await AppointmentService.instance.getAppointments(clientId: clientId);
       _appointments.sort((a, b) => a.startDatetime.compareTo(b.startDatetime));
     } catch (e) {
       _error = e.toString();

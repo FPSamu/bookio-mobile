@@ -34,6 +34,19 @@ class BusinessProvider extends ChangeNotifier {
   Map<String, dynamic>? get myMetrics => _myMetrics;
   List<AppointmentModel>? get myReservations => _myReservations;
 
+  void clear() {
+    _businesses = [];
+    _recommendedBusinesses = [];
+    _myBusiness = null;
+    _myMetrics = null;
+    _myReservations = null;
+    _favoriteIds.clear();
+    _favoriteBusinesses = [];
+    _isLoading = false;
+    _error = null;
+    notifyListeners();
+  }
+
   Future<void> fetchBusinesses() async {
     _isLoading = true;
     _error = null;

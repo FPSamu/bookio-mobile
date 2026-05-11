@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/appointment_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/business_provider.dart';
 import 'package:intl/intl.dart';
 import 'category_list_screen.dart';
@@ -24,7 +25,8 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AppointmentProvider>().fetchAppointments();
+      final uid = context.read<AppAuthProvider>().user?.id;
+      context.read<AppointmentProvider>().fetchAppointments(clientId: uid);
       final bp = context.read<BusinessProvider>();
       bp.fetchBusinesses();
       bp.fetchFavorites();
@@ -34,7 +36,7 @@ class _ClientExploreScreenState extends State<ClientExploreScreen> {
   Future<void> _onRefresh() async {
     await Future.wait([
       context.read<BusinessProvider>().fetchBusinesses(),
-      context.read<AppointmentProvider>().fetchAppointments(),
+      context.read<AppointmentProvider>().fetchAppointments(clientId: context.read<AppAuthProvider>().user?.id),
       context.read<BusinessProvider>().fetchFavorites(),
     ]);
   }

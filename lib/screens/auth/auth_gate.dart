@@ -41,7 +41,10 @@ class AuthGate extends StatelessWidget {
     }
 
     if (auth.isAuthenticated) {
-      return MainNavigation(userRole: auth.role);
+      return MainNavigation(
+        key: ValueKey(auth.user?.id),
+        userRole: auth.role,
+      );
     }
 
     return const LoginScreen();

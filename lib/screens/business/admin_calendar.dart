@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../providers/business_provider.dart';
 import '../../providers/appointment_provider.dart';
 import '../../models/appointment_model.dart';
+import '../../services/business_service.dart';
 import '../../widgets/pending_feature_widget.dart';
 import 'manual_appointment_screen.dart';
 import 'qr_scanner_screen.dart';
@@ -21,22 +22,44 @@ class AdminCalendar extends StatefulWidget {
 class _AdminCalendarState extends State<AdminCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay = DateTime.now();
+  List<Map<String, dynamic>> _schedules = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAppointmentsForDay(_selectedDay ?? DateTime.now());
+      _loadSchedules();
     });
+  }
+
+  Future<void> _loadSchedules() async {
+    try {
+      final data = await BusinessService.instance.getMySchedules();
+      final list = (data['schedules'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+      if (mounted) setState(() => _schedules = list);
+    } catch (_) {}
+  }
+
+  Map<String, dynamic>? _scheduleForDay(DateTime date) {
+    // Dart weekday: Mon=1..Sun=7 → backend day_of_week: Sun=0..Sat=6
+    final backendDay = date.weekday % 7;
+    try {
+      return _schedules.firstWhere((s) => s['day_of_week'] == backendDay);
+    } catch (_) {
+      return null;
+    }
   }
 
   void _loadAppointmentsForDay(DateTime date) {
     final provider = Provider.of<BusinessProvider>(context, listen: false);
-    final dateStr = DateFormat('yyyy-MM-dd').format(date);
-    provider.fetchMyReservations(date: dateStr);
+    // Send local midnight as UTC so backend filter covers the full local day
+    final localMidnight = DateTime(date.year, date.month, date.day);
+    provider.fetchMyReservations(date: localMidnight.toUtc().toIso8601String());
   }
 
   Future<void> _cancelAppointment(String id) async {
+    final provider = Provider.of<AppointmentProvider>(context, listen: false);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -51,22 +74,60 @@ class _AdminCalendarState extends State<AdminCalendar> {
     if (confirm != true) return;
 
     try {
-      await Provider.of<AppointmentProvider>(context, listen: false).cancelAppointment(id);
-      if (mounted) {
-        _loadAppointmentsForDay(_selectedDay ?? DateTime.now());
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cita cancelada correctamente'), backgroundColor: Colors.red),
-        );
-      }
+      await provider.cancelAppointment(id);
+      if (!mounted) return;
+      _loadAppointmentsForDay(_selectedDay ?? DateTime.now());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cita cancelada correctamente'), backgroundColor: Colors.red),
+      );
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
+  Widget _buildScheduleBanner(DateTime date) {
+    final schedule = _scheduleForDay(date);
+    final cs = Theme.of(context).colorScheme;
+    if (schedule == null) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        color: Colors.red.shade50,
+        child: Row(
+          children: [
+            Icon(Icons.block, size: 16, color: Colors.red.shade400),
+            const SizedBox(width: 8),
+            Text('Cerrado hoy', style: TextStyle(color: Colors.red.shade600, fontWeight: FontWeight.w600, fontSize: 13)),
+          ],
+        ),
+      );
+    }
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: cs.primary.withValues(alpha: 0.07),
+      child: Row(
+        children: [
+          Icon(Icons.access_time, size: 16, color: cs.primary),
+          const SizedBox(width: 8),
+          Text(
+            '${schedule['start_time']} – ${schedule['end_time']}',
+            style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BusinessProvider>(context);
-    final appointments = provider.myReservations ?? [];
+    final selected = _selectedDay ?? DateTime.now();
+    final appointments = (provider.myReservations ?? []).where((a) {
+      return a.startDatetime.year == selected.year &&
+          a.startDatetime.month == selected.month &&
+          a.startDatetime.day == selected.day;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -127,22 +188,34 @@ class _AdminCalendarState extends State<AdminCalendar> {
               ),
             ),
           ),
-          
+
+          _buildScheduleBanner(selected),
+
           Expanded(
-            child: appointments.isEmpty
-                ? Center(
-                    child: Text('No hay citas para este día.',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+            child: RefreshIndicator(
+              onRefresh: () async => _loadAppointmentsForDay(_selectedDay ?? DateTime.now()),
+              child: appointments.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(
+                          height: 300,
+                          child: Center(
+                            child: Text(
+                              'No hay citas para este día.',
+                              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(20),
+                      itemCount: appointments.length,
+                      itemBuilder: (context, index) => _buildAppointmentCard(appointments[index]),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: appointments.length,
-                    itemBuilder: (context, index) {
-                      final appt = appointments[index];
-                      return _buildAppointmentCard(appt);
-                    },
-                  ),
+            ),
           ),
         ],
       ),
@@ -161,6 +234,7 @@ class _AdminCalendarState extends State<AdminCalendar> {
 
   Widget _buildAppointmentCard(AppointmentModel appt) {
     final isConfirmed = appt.status == 'CONFIRMED';
+    final isCompleted = appt.status == 'COMPLETED';
     final isCancelled = appt.status == 'CANCELLED';
     final timeStart = DateFormat('hh:mm a').format(appt.startDatetime);
     
@@ -212,7 +286,13 @@ class _AdminCalendarState extends State<AdminCalendar> {
             width: 4,
             height: 40,
             decoration: BoxDecoration(
-              color: isCancelled ? Colors.red : (isConfirmed ? Colors.green : Colors.orange),
+              color: isCancelled
+                  ? Colors.red
+                  : isCompleted
+                      ? Colors.teal
+                      : isConfirmed
+                          ? Colors.green
+                          : Colors.orange,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -228,8 +308,8 @@ class _AdminCalendarState extends State<AdminCalendar> {
                       child: Text(
                         serviceName,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          fontSize: 15, 
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
                           color: isCancelled ? Colors.grey : Theme.of(context).colorScheme.onSurface,
                           decoration: isCancelled ? TextDecoration.lineThrough : null,
                         ),
@@ -237,7 +317,13 @@ class _AdminCalendarState extends State<AdminCalendar> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (servicePrice != null)
+                    if (isCompleted)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(color: Colors.teal.shade50, borderRadius: BorderRadius.circular(8)),
+                        child: const Text('Completada', style: TextStyle(fontSize: 11, color: Colors.teal, fontWeight: FontWeight.bold)),
+                      )
+                    else if (servicePrice != null)
                       Text(
                         '\$${servicePrice.toStringAsFixed(0)}',
                         style: TextStyle(
@@ -266,7 +352,7 @@ class _AdminCalendarState extends State<AdminCalendar> {
               ],
             ),
           ),
-          if (!isCancelled)
+          if (!isCancelled && !isCompleted)
             PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
               onSelected: (value) {
