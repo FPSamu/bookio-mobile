@@ -160,6 +160,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
 
     final isCancelled = apt.status.toUpperCase() == 'CANCELLED';
     final localRating = StorageService.instance.getAppointmentRating(apt.id);
+    final ratingValue = apt.rating ?? localRating;
+    final hasRating = ratingValue != null;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -253,8 +255,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
                           Text('Cita cancelada', style: TextStyle(fontSize: 13, color: cs.onSurface.withValues(alpha: 0.4))),
                         ],
                       )
-                    : localRating != null
-                        ? _ratingDisplay(context, localRating)
+                    : hasRating
+                        ? _alreadyRated(context, ratingValue, apt)
                         : _rateButton(context, apt),
               ),
             ],
@@ -264,18 +266,32 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     );
   }
 
-  Widget _ratingDisplay(BuildContext context, double rating) {
+  Widget _alreadyRated(BuildContext context, double? rating, AppointmentModel apt) {
     final cs = Theme.of(context).colorScheme;
+    final r = rating ?? 0;
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        ...List.generate(5, (i) => Icon(
-          i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: 20,
-          color: Colors.amber.shade500,
-        )),
-        const SizedBox(width: 8),
-        Text(rating.toStringAsFixed(1), style: TextStyle(fontWeight: FontWeight.bold, color: cs.onSurface.withValues(alpha: 0.7))),
+        Row(
+          children: [
+            ...List.generate(5, (i) => Icon(
+              i < r ? Icons.star_rounded : Icons.star_outline_rounded,
+              size: 18,
+              color: Colors.amber.shade500,
+            )),
+            const SizedBox(width: 6),
+            Text('Ya calificado', style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.5))),
+          ],
+        ),
+        TextButton(
+          onPressed: () => _showRatingDialog(context, apt, existingRating: r),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            minimumSize: Size.zero,
+            foregroundColor: cs.secondary,
+          ),
+          child: const Text('Actualizar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+        ),
       ],
     );
   }
@@ -296,8 +312,8 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     );
   }
 
-  void _showRatingDialog(BuildContext context, AppointmentModel apt) {
-    double selectedRating = 0;
+  void _showRatingDialog(BuildContext context, AppointmentModel apt, {double existingRating = 0}) {
+    double selectedRating = existingRating;
     final reviewController = TextEditingController();
     final cs = Theme.of(context).colorScheme;
 

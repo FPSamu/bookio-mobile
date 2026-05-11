@@ -11,10 +11,12 @@ import 'providers/auth_provider.dart';
 import 'providers/business_provider.dart';
 import 'providers/appointment_provider.dart';
 import 'screens/auth/auth_gate.dart';
+import 'services/api_config.dart';
 import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ApiConfig.isProduction = true;
   await dotenv.load(fileName: ".env");
   await initializeDateFormatting('es', null);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

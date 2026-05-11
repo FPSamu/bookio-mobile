@@ -99,4 +99,5 @@ class StorageService {
   Future<void> setNotificationPref(String key, bool value) async {
     await _prefs?.setBool('notif_$key', value);
   }
+
 }

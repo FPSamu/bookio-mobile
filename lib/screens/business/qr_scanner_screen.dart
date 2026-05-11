@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../../providers/business_provider.dart';
@@ -66,7 +67,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             _detailRow(Icons.email, 'Email', appointment.client?.email ?? 'N/A'),
             _detailRow(Icons.phone, 'Teléfono', appointment.client?.phone ?? appointment.clientPhone ?? 'N/A'),
             _detailRow(Icons.spa, 'Servicio', appointment.service?.name ?? 'N/A'),
-            _detailRow(Icons.access_time, 'Hora', '${appointment.startDatetime.hour}:${appointment.startDatetime.minute.toString().padLeft(2, '0')}'),
+            _detailRow(Icons.access_time, 'Hora', DateFormat('hh:mm a').format(appointment.startDatetime)),
             const SizedBox(height: 32),
             if (appointment.status != 'CANCELLED' && appointment.status != 'COMPLETED') ...[
               if (appointment.status == 'PENDING' || appointment.status == 'CONFIRMED')

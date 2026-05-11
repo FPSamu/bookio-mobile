@@ -180,11 +180,6 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
                 // ── Preferencias ────────────────────────────────────
                 _sectionTitle('PREFERENCIAS'),
                 _card([
-                  _tile(context, 'Idioma', Icons.language, cs,
-                    trailing: Text('Español', style: TextStyle(fontSize: 13, color: cs.onSurface.withValues(alpha: 0.5), fontWeight: FontWeight.w500)),
-                    onTap: () => _showLanguageSheet(context),
-                  ),
-                  _divider(),
                   // Dark mode toggle
                   SwitchListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -290,37 +285,6 @@ class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProvid
             ),
           ),
       ],
-    );
-  }
-
-  void _showLanguageSheet(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Idioma', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: cs.onSurface)),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Text('🇲🇽', style: TextStyle(fontSize: 24)),
-              title: const Text('Español', style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: Icon(Icons.check_circle_rounded, color: cs.secondary),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              tileColor: cs.secondaryContainer.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 8),
-            Center(
-              child: Text('Más idiomas próximamente', style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.4))),
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
     );
   }
 

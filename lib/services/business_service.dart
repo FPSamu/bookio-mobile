@@ -96,8 +96,9 @@ class BusinessService {
   }
 
   Future<List<AppointmentModel>> getBusinessReservations({String? date}) async {
-    final query = date != null ? '?date=$date' : '';
-    final data = await _api.get('/businesses/reservations$query');
+    final params = <String, dynamic>{};
+    if (date != null) params['date'] = date;
+    final data = await _api.get('/businesses/reservations', queryParams: params.isNotEmpty ? params : null);
     final List<dynamic> json = data['reservations'] ?? data['data'] ?? (data is List ? data : []);
     return json.map((j) => AppointmentModel.fromJson(j as Map<String, dynamic>)).toList();
   }
